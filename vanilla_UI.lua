@@ -259,6 +259,10 @@ function UI.TextControl(displayName)
     end
 end
 
+function UI.Groupbox(displayName) 
+    Renderer.DrawBorderedRect(GUI.position.x+9, GUI.position.y+29, GUI.position.w-20, GUI.position.h-40, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
+end
+
 local runMenu = function()
     local runOnce = true
     local menuTabs = {
@@ -286,6 +290,7 @@ local runMenu = function()
             --[[UI.TextControl("Current tab "..menuTabs[currentTab]["name"])]]
             UI.TextControl("Nertigel's Vanilla UI Demo")
             UI.SameLine()
+            UI.Groupbox()
             for key=1, #menuTabs do
                 local value = menuTabs[key]
                 if (value) then
