@@ -14,6 +14,8 @@ UI.style = {
     Item_Hovered = {r = 0, g = 0, b = 0, a = 75},
     Item_Hold = {r = 255, g = 255, b = 255, a = 100},
     Item_Toggled = {r = 255, g = 0, b = 95, a = 255},
+    TextControl = {r = 255, g = 255, b = 255, a = 100},
+    TextControl_Hovered = {r = 200, g = 200, b = 200, a = 175},
 }
 UI.natives = {}
 local GUI = {
@@ -235,6 +237,28 @@ function UI.Button(displayName, size, clickFunc, forceSelected)
     end
 end
 
+function UI.TextControl(displayName)
+    GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
+    GUI.prev_item = GUI.item
+    if not GUI.vars.sameline then
+        if GUI.prev_item.y ~= 0 then
+            GUI.item = {x = GUI.position.x + 5, y = GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+        else
+            GUI.item = {x = GUI.position.x + 5, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+        end
+    else
+        GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 5, y = GUI.prev_item.y, w = 20, h = 20, name = displayName}
+        GUI.vars.sameline = false
+    end
+    GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI.item.w
+    
+    if Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h) then
+        Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
+    else
+        Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
+    end
+end
+
 local runMenu = function()
     local runOnce = true
     local menuTabs = {
@@ -259,6 +283,9 @@ local runMenu = function()
         if (GUI.active) then
             UI.Begin("Vanilla UI Demo", {NoBorder = false})
 
+            --[[UI.TextControl("Current tab "..menuTabs[currentTab]["name"])]]
+            UI.TextControl("Nertigel's Vanilla UI Demo")
+            UI.SameLine()
             for key=1, #menuTabs do
                 local value = menuTabs[key]
                 if (value) then
@@ -269,7 +296,7 @@ local runMenu = function()
                     else
                         UI.Button(value["name"], Vec2(100, 20), function() 
                             log(false, "changed tab to "..key)
-                            currentTab = value
+                            currentTab = key
                         end)
                     end
                     if (key < #menuTabs) then
