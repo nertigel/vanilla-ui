@@ -3,25 +3,24 @@ local UI = {
     error = false,
     hovered = {},
     cache = {},
+    style = {
+        logColor = "5",
+        Background = {r = 25, g = 25, b = 25, a = 200},
+        Background_Border = {r = 150, g = 150, b = 150, a = 255},
+        Checkbox_Text = {r = 200, g = 200, b = 200, a = 175},
+        Button_Text = {r = 15, g = 15, b = 15, a = 225},
+        Item_Background = {r = 150, g = 150, b = 150, a = 225},
+        Item_Hovered = {r = 0, g = 0, b = 0, a = 75},
+        Item_Hold = {r = 255, g = 255, b = 255, a = 100},
+        Item_Toggled = {r = 0, g = 255, b = 255, a = 255},
+        TextControl = {r = 255, g = 255, b = 255, a = 100},
+        TextControl_Hovered = {r = 200, g = 200, b = 200, a = 175},
+    }
 }
-UI.style = {
-    logColor = "5",
-    Background = {r = 0, g = 0, b = 0, a = 175},
-    Background_Border = {r = 255, g = 0, b = 95, a = 255},
-    Checkbox_Text = {r = 255, g = 255, b = 255, a = 255},
-    Button_Text = {r = 20, g = 20, b = 20, a = 255},
-    Item_Background = {r = 255, g = 255, b = 255, a = 200},
-    Item_Hovered = {r = 0, g = 0, b = 0, a = 75},
-    Item_Hold = {r = 255, g = 255, b = 255, a = 100},
-    Item_Toggled = {r = 255, g = 0, b = 95, a = 255},
-    TextControl = {r = 255, g = 255, b = 255, a = 100},
-    TextControl_Hovered = {r = 200, g = 200, b = 200, a = 175},
-}
-UI.natives = {}
 local GUI = {
     nextSize = nil,
     active = true,
-    position = {x = 200, y = 200, w = 600, h = 500},
+    position = {x = 500, y = 250, w = 600, h = 500},
     item = {x = 0, y = 0, w = 0, h = 0, name = ""},
     prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""},
     cursor = {x = 0, y = 0, old_x = 0, old_y = 0},
@@ -30,9 +29,9 @@ local GUI = {
     vars = {sameline = false, menuKey = -1, lastname = ""},
     config = {},
 }
-
 GUI.screen.w, GUI.screen.h = Citizen.InvokeNative(0x873C9F3104101DD3, Citizen.PointerValueInt(), Citizen.PointerValueInt())
 
+UI.natives = {}
 function UI.natives.GetNuiCursorPosition()
     return Citizen.InvokeNative(0xbdba226f, Citizen.PointerValueInt(), Citizen.PointerValueInt())
 end
@@ -69,12 +68,12 @@ function Renderer.DrawBorderedRect(x, y, w, h, r, g, b, a)
 	Renderer.DrawRect(x, (y - 1) + h, w, 1, r, g, b, a)
 end
 
-function Renderer.DrawCursor()
+function Renderer.DrawCursor(custom_x, custom_y)
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
-	Renderer.DrawRect(GUI.cursor.x - 2, GUI.cursor.y - 7, 3, 13, 0, 0, 0, 255)
-	Renderer.DrawRect(GUI.cursor.x - 7, GUI.cursor.y - 2, 13, 3, 0, 0, 0, 255)
-	Renderer.DrawRect(GUI.cursor.x - 1, GUI.cursor.y - 6, 1, 11, 255, 255, 255, 255)
-	Renderer.DrawRect(GUI.cursor.x - 6, GUI.cursor.y - 1, 11, 1, 255, 255, 255, 255)
+	Renderer.DrawRect((custom_x or GUI.cursor.x) - 2, (custom_y or GUI.cursor.y) - 7, 3, 13, 0, 0, 0, 255)
+	Renderer.DrawRect((custom_x or GUI.cursor.x) - 7, (custom_y or GUI.cursor.y) - 2, 13, 3, 0, 0, 0, 255)
+	Renderer.DrawRect((custom_x or GUI.cursor.x) - 1, (custom_y or GUI.cursor.y) - 6, 1, 11, 255, 255, 255, 255)
+	Renderer.DrawRect((custom_x or GUI.cursor.x) - 6, (custom_y or GUI.cursor.y) - 1, 11, 1, 255, 255, 255, 255)
 end
 
 function Renderer.DrawText(x, y, r, g, b, a, text, font, centered, scale)
@@ -203,6 +202,8 @@ function UI.Checkbox(displayName, configName, clickFunc)
     end
     if Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h) then
         Renderer.DrawRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Hovered.r, UI.style.Item_Hovered.g, UI.style.Item_Hovered.b, UI.style.Item_Hovered.a)
+        Renderer.DrawBorderedRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
+
         if UI.natives.IsDisabledControlJustReleased(0, 24) then
             GUI.config[configName] = not GUI.config[configName]
             if clickFunc then
@@ -233,6 +234,8 @@ function UI.Button(displayName, size, clickFunc, forceSelected)
     Renderer.DrawText(GUI.item.x+(GUI.item.w/2), GUI.item.y-2, UI.style.Button_Text.r, UI.style.Button_Text.g, UI.style.Button_Text.b, UI.style.Button_Text.a, tostring(displayName), 4, true, 0.30)
     if Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h) then
         Renderer.DrawRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Hovered.r, UI.style.Item_Hovered.g, UI.style.Item_Hovered.b, UI.style.Item_Hovered.a)
+        Renderer.DrawBorderedRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
+        
         if UI.natives.IsDisabledControlJustReleased(0, 24) then
             if clickFunc then
                 clickFunc()
@@ -271,19 +274,34 @@ function UI.Groupbox(displayName)
     Renderer.DrawBorderedRect(GUI.position.x+9, GUI.position.y+29, GUI.position.w-20, GUI.position.h-40, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
 end
 
-local runMenu = function()
+local nertigel = {
+    ["draw_menu"] = true,
+    ["datastore"] = {},
+    ["credits"] = "vanilla for b1g vanilla-ui github repo"
+}
+
+nertigel["draw_menu"] = function()
     local runOnce = true
     local menuTabs = {
-        [1] = { ["name"] = "Self Options", ["size"] = Vec2(70, 20) },
-        [2] = { ["name"] = "Online Options", ["size"] = Vec2(70, 20) },
-        [3] = { ["name"] = "Visual Options", ["size"] = Vec2(70, 20) },
-        [4] = { ["name"] = "Settings", ["size"] = Vec2(70, 20) },
+        [1] = { ["name"] = "Player", ["size"] = Vec2(90, 20) },
+        [2] = { ["name"] = "Weapons", ["size"] = Vec2(90, 20) },
+        [3] = { ["name"] = "Visuals", ["size"] = Vec2(90, 20) },
+        [4] = { ["name"] = "Settings", ["size"] = Vec2(90, 20) },
     }
     local currentTab = 1
-    while true do
+    while nertigel["draw_menu"] do
         Citizen["Wait"](0)
 
         --[[don't mind this shit]]
+        nertigel["datastore"]["local_player"] = {
+            ["id"] = PlayerId(),
+            ["ped"] = PlayerPedId(),
+            ["coords"] = GetEntityCoords(PlayerPedId()),
+            ["heading"] = GetEntityHeading(PlayerPedId()),
+        }
+        local __w, __h = GetActiveScreenResolution()
+        nertigel["datastore"]["screen_w"] = __w
+        nertigel["datastore"]["screen_h"] = __h
         if (runOnce) then
             UI.PushNextWindowSize(550, 300)
             UI.SetMenuKey(121)
@@ -294,21 +312,21 @@ local runMenu = function()
         UI.CheckOpen()
 
         if (GUI.active) then --[[drawing menu]]
-            UI.Begin("Vanilla UI Demo", {NoBorder = false})
+            UI.Begin("Nertigel's Pasted UI", {NoBorder = false})
 
             --[[UI.TextControl("Current tab "..menuTabs[currentTab]["name"])]]
-            UI.TextControl("Nertigel's Vanilla UI Demo")
+            UI.TextControl("Nertigel's Pasted UI")
             UI.SameLine()
             UI.Groupbox()
             for key=1, #menuTabs do
                 local value = menuTabs[key]
                 if (value) then
-                    if (currentTab == value) then
-                        UI.Button(value["name"], value["size"] or Vec2(100, 20), function() 
+                    if (currentTab == key) then
+                        UI.Button(""..value["name"], Vec2(100, 20), function() 
                             log(false, "current tab "..key)
                         end)
                     else
-                        UI.Button(value["name"], value["size"] or Vec2(100, 20), function() 
+                        UI.Button(value["name"], value["size"], function() 
                             log(false, "changed tab to "..key)
                             currentTab = key
                         end)
@@ -318,17 +336,112 @@ local runMenu = function()
                     end
                 end
             end
+            if (currentTab == 1) then --[[Self]]
+                UI.Button("Revive", Vec2(100, 20), nertigel.menu_features["self_revive"])
+                UI.SameLine()
+                UI.Button("Heal", Vec2(100, 20), nertigel.menu_features["self_heal"])
+                UI.SameLine()
+                UI.Button("Armour", Vec2(100, 20), nertigel.menu_features["self_armour"])
 
-            UI.Checkbox("Test Checkbox", "cTestCheckbox", function() log(false, "Checkbox Toggled") end)
-            UI.Button("Test Button", Vec2(100, 20), function() log(false, "Button Pressed") end)
-
-            UI.Checkbox("Test Checkbox 2", "cTestCheckbox2")
-            UI.SameLine()
-            UI.Button("Test Button2", Vec2(100, 20), function() log(false, "Button Pressed 2") end)
+                UI.Checkbox("Super jump", "self_super_jump")
+                UI.SameLine()
+                UI.Checkbox("Infinite stamina", "self_infinite_stamina")
+                UI.SameLine()
+                UI.Checkbox("Heat vision", "self_heat_vision")
+                UI.SameLine()
+                UI.Checkbox("Night vision", "self_night_vision")
+                UI.SameLine()
+                UI.Checkbox("Never wanted", "self_never_wanted")
+            elseif (currentTab == 2) then --[[Weapons]]
+                UI.Checkbox("Infinite combat roll", "weapons_infinite_combat_roll")
+            elseif (currentTab == 3) then --[[Visuals]]
+                UI.Checkbox("Crosshair", "visuals_crosshair")
+                UI.SameLine()
+                UI.Checkbox("Force thirdperson", "visuals_thirdperson")
+                UI.SameLine()
+                UI.Checkbox("Force radar", "visuals_force_radar")
+            elseif (currentTab == 4) then --[[Settings]]
+                UI.Button("Unload", Vec2(100, 20), nertigel.menu_features["unload_menu"])
+            end
 
             UI.End()
         end
     end
 end
+Citizen["CreateThread"](nertigel["draw_menu"])
 
-Citizen["CreateThread"](runMenu)
+nertigel["run_features"] = function()
+    while nertigel["draw_menu"] do
+        Citizen["Wait"](0)
+
+        if (GUI.active) then
+
+        else
+            if (GUI.config["visuals_crosshair"]) then
+                Renderer.DrawCursor(nertigel["datastore"]["screen_w"] / 2, nertigel["datastore"]["screen_h"] / 2)
+            end
+        end
+        --[[Player]]
+        if (GUI.config["self_super_jump"]) then
+            SetSuperJumpThisFrame(nertigel["datastore"]["local_player"]["id"])
+        end
+        if (GUI.config["self_infinite_stamina"]) then
+            ResetPlayerStamina(nertigel["datastore"]["local_player"]["id"])
+        end
+        SetSeethrough(GUI.config["self_heat_vision"])
+        SetNightvision(GUI.config["self_night_vision"])
+        if (GUI.config["self_never_wanted"]) then
+            ClearPlayerWantedLevel(nertigel["datastore"]["local_player"]["id"])
+        end
+        
+        --[[Weapons]]
+        if (GUI.config["weapons_infinite_combat_roll"]) then
+            for i = 0, 3 do
+                StatSetInt(GetHashKey("mp" .. i .. "_shooting_ability"), 1000, true)
+                StatSetInt(GetHashKey("sp" .. i .. "_shooting_ability"), 1000, true)
+            end
+        else
+            for i = 0, 3 do
+                StatSetInt(GetHashKey("mp" .. i .. "_shooting_ability"), 0, true)
+                StatSetInt(GetHashKey("sp" .. i .. "_shooting_ability"), 0, true)
+            end
+        end
+
+        --[[Visuals]]
+        if (GUI.config["visuals_thirdperson"]) then
+            SetFollowPedCamViewMode(1)
+        end
+        if (GUI.config["visuals_force_radar"]) then
+            DisplayRadar(true)
+        end
+    end
+end
+Citizen["CreateThread"](nertigel["run_features"])
+
+nertigel.menu_features = {
+    ["unload_menu"] = (function()
+        nertigel["draw_menu"] = false
+    end),
+    ["self_heal"] = (function()
+        SetEntityHealth(nertigel["datastore"]["local_player"]["ped"], 200)
+    end),
+    ["self_armour"] = (function()
+        SetPedArmour(nertigel["datastore"]["local_player"]["ped"], 200)
+    end),
+    ["self_revive"] = (function()
+        log(false, "Self revive")
+        
+        local ped = nertigel["datastore"]["local_player"]["ped"]
+        local coords = nertigel["datastore"]["local_player"]["coords"]
+        local heading = nertigel["datastore"]["local_player"]["heading"]
+        SetEntityCoordsNoOffset(ped, coords.x, coords.y, coords.z, false, false, false, true)
+        NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, heading, true, false)
+        SetPlayerInvincible(ped, false)
+        TriggerEvent('playerSpawned', coords.x, coords.y, coords.z)
+        ClearPedBloodDamage(ped)
+        StopScreenEffect('DeathFailOut')
+    end),
+    [""] = (function()
+        
+    end),
+}
