@@ -49,7 +49,7 @@ function UI.natives.IsDisabledControlReleased(inputGroup, control)
 end
 
 local function log(error, ...)
-    if error then
+    if (error) then
         UI.error = true
     end
     print(error and "^9[Error]" .. string.format(...) or "^3[Vanilla UI] ^" .. UI.style.logColor .. string.format(...))
@@ -91,7 +91,7 @@ function Renderer.GetTextWidthS(string, font, scale)
 	scale = scale or 0.35
 	UI.cache[font] = UI.cache[font] or {}
 	UI.cache[font][scale] = UI.cache[font][scale] or {}
-	if UI.cache[font][scale][string] then return UI.cache[font][scale][string].length end
+	if (UI.cache[font][scale][string]) then return UI.cache[font][scale][string].length end
 	Citizen.InvokeNative(0x54CE8AC98E120CAB, "STRING")
 	Citizen.InvokeNative(0x6C188BE134E074AA, string)
 	Citizen.InvokeNative(0x66E0276CC5F6B9DA, font or 4)
@@ -112,7 +112,7 @@ end
 
 function Renderer.mouseInBounds(x, y, w, h)
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
-    if GUI.cursor.x > x and GUI.cursor.y > y and GUI.cursor.x < x + w and GUI.cursor.y < y + h then
+    if (GUI.cursor.x > x and GUI.cursor.y > y and GUI.cursor.x < x + w and GUI.cursor.y < y + h) then
         return true 
     end
     return false
@@ -129,14 +129,14 @@ function UI.DisableActions() 	DisableControlAction(1, 36, true) 	DisableControlA
 - NoBorder]]
 function UI.Begin(name, flags)
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
-    if name == nil then
+    if (name == nil) then
         return log(true, "Please provide a GUI name when calling 'GUI.Begin()'")
     else
-        if GUI.nextSize then
+        if (GUI.nextSize) then
             GUI.position.w, GUI.position.h = GUI.nextSize.w, GUI.nextSize.h
         end
         Renderer.DrawRect(GUI.position.x, GUI.position.y, GUI.position.w, GUI.position.h, UI.style.Background.r, UI.style.Background.g, UI.style.Background.b, UI.style.Background.a)
-        if not flags or not flags.NoBorder then
+        if (not flags or not flags.NoBorder) then
             Renderer.DrawBorderedRect(GUI.position.x-1, GUI.position.y-1, GUI.position.w+2, GUI.position.h+2, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
         end
     end
@@ -167,7 +167,7 @@ end
 
 -- Checks for menu key pressed
 function UI.CheckOpen()
-    if UI.natives.IsDisabledControlJustPressed(0, GUI.vars.menuKey) then
+    if (UI.natives.IsDisabledControlJustPressed(0, GUI.vars.menuKey)) then
         GUI.active = not GUI.active
     end
 end
@@ -176,7 +176,7 @@ end
 -- configName : String (Name in the config)
 -- clickFunc : Function (Called on click)
 function UI.Checkbox(displayName, configName, clickFunc)
-    if GUI.config[configName] == nil then
+    if (GUI.config[configName] == nil) then
         GUI.config[configName] = false
         log(false, "Creating config variable for: " .. configName)
     end
@@ -184,8 +184,8 @@ function UI.Checkbox(displayName, configName, clickFunc)
     local hoveredItem = "h"..configName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
-    if not GUI.vars.sameline then
-        if GUI.prev_item.y ~= 0 then
+    if (not GUI.vars.sameline) then
+        if (GUI.prev_item.y ~= 0) then
             GUI.item = {x = GUI.position.x + 15, y = GUI.prev_item.y + GUI.prev_item.h + 10, w = 20, h = 20, name = displayName}
         else
             GUI.item = {x = GUI.position.x + 15, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 10, w = 20, h = 20, name = displayName}
@@ -197,20 +197,20 @@ function UI.Checkbox(displayName, configName, clickFunc)
     GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI.item.w
     Renderer.DrawText(GUI.item.x+22, GUI.item.y-2, UI.style.Checkbox_Text.r, UI.style.Checkbox_Text.g, UI.style.Checkbox_Text.b, UI.style.Checkbox_Text.a, tostring(displayName), 4, false, 0.30)
     Renderer.DrawRect(GUI.item.x, GUI.item.y, 20, 20, UI.style.Item_Background.r, UI.style.Item_Background.g, UI.style.Item_Background.b, UI.style.Item_Background.a)
-    if GUI.config[configName] == true then
+    if (GUI.config[configName] == true) then
         Renderer.DrawRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
     end
-    if Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h) then
+    if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
         Renderer.DrawRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Hovered.r, UI.style.Item_Hovered.g, UI.style.Item_Hovered.b, UI.style.Item_Hovered.a)
         Renderer.DrawBorderedRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
 
-        if UI.natives.IsDisabledControlJustReleased(0, 24) then
+        if (UI.natives.IsDisabledControlJustReleased(0, 24)) then
             GUI.config[configName] = not GUI.config[configName]
-            if clickFunc then
+            if (clickFunc) then
                 clickFunc()
             end
         end
-        if UI.natives.IsDisabledControlPressed(0, 24) then
+        if (UI.natives.IsDisabledControlPressed(0, 24)) then
             Renderer.DrawRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Hold.r, UI.style.Item_Hold.g, UI.style.Item_Hold.b, UI.style.Item_Hold.a)
         end
     end
@@ -220,8 +220,8 @@ function UI.Button(displayName, size, clickFunc)
     GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
-    if not GUI.vars.sameline then
-        if GUI.prev_item.y ~= 0 then
+    if (not GUI.vars.sameline) then
+        if (GUI.prev_item.y ~= 0) then
             GUI.item = {x = GUI.position.x + 15, y = GUI.prev_item.y + GUI.prev_item.h + 10, w = size[1], h = size[2], name = displayName}
         else
             GUI.item = {x = GUI.position.x + 15, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 10, w = size[1], h = size[2], name = displayName}
@@ -232,16 +232,16 @@ function UI.Button(displayName, size, clickFunc)
     end
     Renderer.DrawRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Background.r, UI.style.Item_Background.g, UI.style.Item_Background.b, UI.style.Item_Background.a)
     Renderer.DrawText(GUI.item.x+(GUI.item.w/2), GUI.item.y-2, UI.style.Button_Text.r, UI.style.Button_Text.g, UI.style.Button_Text.b, UI.style.Button_Text.a, tostring(displayName), 4, true, 0.30)
-    if Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h) then
+    if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
         Renderer.DrawRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Hovered.r, UI.style.Item_Hovered.g, UI.style.Item_Hovered.b, UI.style.Item_Hovered.a)
         Renderer.DrawBorderedRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
         
-        if UI.natives.IsDisabledControlJustReleased(0, 24) then
-            if clickFunc then
+        if (UI.natives.IsDisabledControlJustReleased(0, 24)) then
+            if (clickFunc) then
                 clickFunc()
             end
         end
-        if UI.natives.IsDisabledControlPressed(0, 24) then
+        if (UI.natives.IsDisabledControlPressed(0, 24)) then
             Renderer.DrawRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Hold.r, UI.style.Item_Hold.g, UI.style.Item_Hold.b, UI.style.Item_Hold.a)
         end
     end
@@ -251,8 +251,8 @@ function UI.TextControl(displayName)
     GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
-    if not GUI.vars.sameline then
-        if GUI.prev_item.y ~= 0 then
+    if (not GUI.vars.sameline) then
+        if (GUI.prev_item.y ~= 0) then
             GUI.item = {x = GUI.position.x + 10, y = GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
         else
             GUI.item = {x = GUI.position.x + 10, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
@@ -263,7 +263,7 @@ function UI.TextControl(displayName)
     end
     GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI.item.w
     
-    if Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h) then
+    if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
         Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
     else
         Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
@@ -284,9 +284,10 @@ nertigel["draw_menu"] = function()
     local runOnce = true
     local menuTabs = {
         [1] = { ["name"] = "Player", ["size"] = Vec2(90, 20) },
-        [2] = { ["name"] = "Weapons", ["size"] = Vec2(90, 20) },
-        [3] = { ["name"] = "Visuals", ["size"] = Vec2(90, 20) },
-        [4] = { ["name"] = "Settings", ["size"] = Vec2(90, 20) },
+        [2] = { ["name"] = "Weapon", ["size"] = Vec2(90, 20) },
+        [3] = { ["name"] = "Vehicle", ["size"] = Vec2(90, 20) },
+        [4] = { ["name"] = "Visual", ["size"] = Vec2(90, 20) },
+        [5] = { ["name"] = "Settings", ["size"] = Vec2(90, 20) },
     }
     local currentTab = 1
     while nertigel["draw_menu"] do
@@ -300,7 +301,7 @@ nertigel["draw_menu"] = function()
             ["heading"] = GetEntityHeading(PlayerPedId()),
         }
         if (runOnce) then
-            UI.PushNextWindowSize(550, 300)
+            UI.PushNextWindowSize(650, 300)
             UI.SetMenuKey(121)
             log(false, "Ran init")
             runOnce = false
@@ -333,7 +334,7 @@ nertigel["draw_menu"] = function()
                     end
                 end
             end
-            if (currentTab == 1) then --[[Self]]
+            if (currentTab == 1) then --[[Player]]
                 UI.Button("Revive", Vec2(80, 20), nertigel.menu_features["self_revive"])
                 UI.SameLine()
                 UI.Button("Heal", Vec2(80, 20), nertigel.menu_features["self_heal"])
@@ -349,15 +350,17 @@ nertigel["draw_menu"] = function()
                 UI.Checkbox("Night vision", "self_night_vision")
                 UI.SameLine()
                 UI.Checkbox("Never wanted", "self_never_wanted")
-            elseif (currentTab == 2) then --[[Weapons]]
+            elseif (currentTab == 2) then --[[Weapon]]
                 UI.Checkbox("Infinite combat roll", "weapons_infinite_combat_roll")
-            elseif (currentTab == 3) then --[[Visuals]]
+            elseif (currentTab == 3) then --[[Vehicle]]
+
+            elseif (currentTab == 4) then --[[Visual]]
                 UI.Checkbox("Crosshair", "visuals_crosshair")
                 UI.SameLine()
                 UI.Checkbox("Force thirdperson", "visuals_thirdperson")
                 UI.SameLine()
                 UI.Checkbox("Force radar", "visuals_force_radar")
-            elseif (currentTab == 4) then --[[Settings]]
+            elseif (currentTab == 5) then --[[Settings]]
                 UI.Button("Unload", Vec2(80, 20), nertigel.menu_features["unload_menu"])
             end
 
@@ -391,7 +394,7 @@ nertigel["run_features"] = function()
             ClearPlayerWantedLevel(nertigel["datastore"]["local_player"]["id"])
         end
         
-        --[[Weapons]]
+        --[[Weapon]]
         if (GUI.config["weapons_infinite_combat_roll"]) then
             for i = 0, 3 do
                 StatSetInt(GetHashKey("mp" .. i .. "_shooting_ability"), 1000, true)
@@ -404,7 +407,7 @@ nertigel["run_features"] = function()
             end
         end
 
-        --[[Visuals]]
+        --[[Visual]]
         if (GUI.config["visuals_thirdperson"]) then
             SetFollowPedCamViewMode(1)
         end
