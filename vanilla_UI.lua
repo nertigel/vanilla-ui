@@ -27,7 +27,7 @@ local GUI = {
     cursor = {x = 0, y = 0, old_x = 0, old_y = 0},
     dragging = {Should_Drag = false, Should_Move = false},
     screen = {w = 0, h = 0},
-    vars = {sameline = false, menuKey = -1},
+    vars = {sameline = false, menuKey = -1, lastname = ""},
     config = {},
 }
 
@@ -161,6 +161,11 @@ function UI.SetMenuKey(key)
     GUI.vars.menuKey = key
 end
 
+-- Returns the last displayname parameter passed
+function UI.GetLastName()
+    return (GUI.vars.lastname or "none")
+end
+
 -- Checks for menu key pressed
 function UI.CheckOpen()
     if UI.natives.IsDisabledControlJustPressed(0, GUI.vars.menuKey) then
@@ -176,6 +181,7 @@ function UI.Checkbox(displayName, configName, clickFunc)
         GUI.config[configName] = false
         log(false, "Creating config variable for: " .. configName)
     end
+    GUI.vars.lastname = displayName
     local hoveredItem = "h"..configName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
@@ -210,6 +216,7 @@ function UI.Checkbox(displayName, configName, clickFunc)
 end
 
 function UI.Button(displayName, size, clickFunc, forceSelected)
+    GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
     if not GUI.vars.sameline then
@@ -238,6 +245,7 @@ function UI.Button(displayName, size, clickFunc, forceSelected)
 end
 
 function UI.TextControl(displayName)
+    GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
     if not GUI.vars.sameline then
