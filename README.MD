@@ -1,5 +1,7 @@
 # Vanilla UI
 
+![image](preview.png)
+
 Vanilla UI is an open sourced UI. You are able to edit it to your desire.
 I made this UI to give people an open sourced click gui for mod menus
 
