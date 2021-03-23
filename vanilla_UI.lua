@@ -187,9 +187,9 @@ function UI.Checkbox(displayName, configName, clickFunc)
     GUI.prev_item = GUI.item
     if not GUI.vars.sameline then
         if GUI.prev_item.y ~= 0 then
-            GUI.item = {x = GUI.position.x + 10, y = GUI.prev_item.y + GUI.prev_item.h + 10, w = 20, h = 20, name = displayName}
+            GUI.item = {x = GUI.position.x + 15, y = GUI.prev_item.y + GUI.prev_item.h + 10, w = 20, h = 20, name = displayName}
         else
-            GUI.item = {x = GUI.position.x + 10, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 10, w = 20, h = 20, name = displayName}
+            GUI.item = {x = GUI.position.x + 15, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 10, w = 20, h = 20, name = displayName}
         end
     else
         GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 10, y = GUI.prev_item.y, w = 20, h = 20, name = displayName}
@@ -221,9 +221,9 @@ function UI.Button(displayName, size, clickFunc, forceSelected)
     GUI.prev_item = GUI.item
     if not GUI.vars.sameline then
         if GUI.prev_item.y ~= 0 then
-            GUI.item = {x = GUI.position.x + 10, y = GUI.prev_item.y + GUI.prev_item.h + 10, w = size[1], h = size[2], name = displayName}
+            GUI.item = {x = GUI.position.x + 15, y = GUI.prev_item.y + GUI.prev_item.h + 10, w = size[1], h = size[2], name = displayName}
         else
-            GUI.item = {x = GUI.position.x + 10, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 10, w = size[1], h = size[2], name = displayName}
+            GUI.item = {x = GUI.position.x + 15, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 10, w = size[1], h = size[2], name = displayName}
         end
     else
         GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 10, y = GUI.prev_item.y, w = size[1], h = size[2], name = displayName}
@@ -250,9 +250,9 @@ function UI.TextControl(displayName)
     GUI.prev_item = GUI.item
     if not GUI.vars.sameline then
         if GUI.prev_item.y ~= 0 then
-            GUI.item = {x = GUI.position.x + 5, y = GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+            GUI.item = {x = GUI.position.x + 10, y = GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
         else
-            GUI.item = {x = GUI.position.x + 5, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+            GUI.item = {x = GUI.position.x + 10, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
         end
     else
         GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 5, y = GUI.prev_item.y, w = 20, h = 20, name = displayName}
