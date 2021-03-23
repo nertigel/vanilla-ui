@@ -274,17 +274,18 @@ end
 local runMenu = function()
     local runOnce = true
     local menuTabs = {
-        [1] = { ["name"] = "Self Options" },
-        [2] = { ["name"] = "Online Options" },
-        [3] = { ["name"] = "Visual Options" },
-        [4] = { ["name"] = "Settings" },
+        [1] = { ["name"] = "Self Options", ["size"] = Vec2(70, 20) },
+        [2] = { ["name"] = "Online Options", ["size"] = Vec2(70, 20) },
+        [3] = { ["name"] = "Visual Options", ["size"] = Vec2(70, 20) },
+        [4] = { ["name"] = "Settings", ["size"] = Vec2(70, 20) },
     }
     local currentTab = 1
     while true do
         Citizen["Wait"](0)
 
+        --[[don't mind this shit]]
         if (runOnce) then
-            UI.PushNextWindowSize(600, 500)
+            UI.PushNextWindowSize(550, 300)
             UI.SetMenuKey(121)
             log(false, "Ran init")
             runOnce = false
@@ -292,7 +293,7 @@ local runMenu = function()
 
         UI.CheckOpen()
 
-        if (GUI.active) then
+        if (GUI.active) then --[[drawing menu]]
             UI.Begin("Vanilla UI Demo", {NoBorder = false})
 
             --[[UI.TextControl("Current tab "..menuTabs[currentTab]["name"])]]
@@ -303,11 +304,11 @@ local runMenu = function()
                 local value = menuTabs[key]
                 if (value) then
                     if (currentTab == value) then
-                        UI.Button(value["name"], Vec2(100, 20), function() 
+                        UI.Button(value["name"], value["size"] or Vec2(100, 20), function() 
                             log(false, "current tab "..key)
                         end)
                     else
-                        UI.Button(value["name"], Vec2(100, 20), function() 
+                        UI.Button(value["name"], value["size"] or Vec2(100, 20), function() 
                             log(false, "changed tab to "..key)
                             currentTab = key
                         end)
