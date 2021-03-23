@@ -299,9 +299,6 @@ nertigel["draw_menu"] = function()
             ["coords"] = GetEntityCoords(PlayerPedId()),
             ["heading"] = GetEntityHeading(PlayerPedId()),
         }
-        local __w, __h = GetActiveScreenResolution()
-        nertigel["datastore"]["screen_w"] = __w
-        nertigel["datastore"]["screen_h"] = __h
         if (runOnce) then
             UI.PushNextWindowSize(550, 300)
             UI.SetMenuKey(121)
@@ -337,11 +334,11 @@ nertigel["draw_menu"] = function()
                 end
             end
             if (currentTab == 1) then --[[Self]]
-                UI.Button("Revive", Vec2(100, 20), nertigel.menu_features["self_revive"])
+                UI.Button("Revive", Vec2(80, 20), nertigel.menu_features["self_revive"])
                 UI.SameLine()
-                UI.Button("Heal", Vec2(100, 20), nertigel.menu_features["self_heal"])
+                UI.Button("Heal", Vec2(80, 20), nertigel.menu_features["self_heal"])
                 UI.SameLine()
-                UI.Button("Armour", Vec2(100, 20), nertigel.menu_features["self_armour"])
+                UI.Button("Armour", Vec2(80, 20), nertigel.menu_features["self_armour"])
 
                 UI.Checkbox("Super jump", "self_super_jump")
                 UI.SameLine()
@@ -361,7 +358,7 @@ nertigel["draw_menu"] = function()
                 UI.SameLine()
                 UI.Checkbox("Force radar", "visuals_force_radar")
             elseif (currentTab == 4) then --[[Settings]]
-                UI.Button("Unload", Vec2(100, 20), nertigel.menu_features["unload_menu"])
+                UI.Button("Unload", Vec2(80, 20), nertigel.menu_features["unload_menu"])
             end
 
             UI.End()
@@ -375,10 +372,10 @@ nertigel["run_features"] = function()
         Citizen["Wait"](0)
 
         if (GUI.active) then
-
+            
         else
             if (GUI.config["visuals_crosshair"]) then
-                Renderer.DrawCursor(nertigel["datastore"]["screen_w"] / 2, nertigel["datastore"]["screen_h"] / 2)
+                Renderer.DrawCursor(GUI.screen.w / 2, GUI.screen.h / 2)
             end
         end
         --[[Player]]
