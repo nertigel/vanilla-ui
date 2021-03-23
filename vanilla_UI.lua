@@ -216,7 +216,7 @@ function UI.Checkbox(displayName, configName, clickFunc)
     end
 end
 
-function UI.Button(displayName, size, clickFunc, forceSelected)
+function UI.Button(displayName, size, clickFunc)
     GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
