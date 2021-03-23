@@ -207,7 +207,7 @@ function UI.Checkbox(displayName, configName, clickFunc)
     end
 end
 
-function UI.Button(displayName, size, clickFunc)
+function UI.Button(displayName, size, clickFunc, forceSelected)
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
     if not GUI.vars.sameline then
@@ -237,6 +237,13 @@ end
 
 local runMenu = function()
     local runOnce = true
+    local menuTabs = {
+        [1] = { ["name"] = "Self Options" },
+        [2] = { ["name"] = "Online Options" },
+        [3] = { ["name"] = "Visual Options" },
+        [4] = { ["name"] = "Settings" },
+    }
+    local currentTab = 1
     while true do
         Citizen["Wait"](0)
 
@@ -251,6 +258,25 @@ local runMenu = function()
 
         if (GUI.active) then
             UI.Begin("Vanilla UI Demo", {NoBorder = false})
+
+            for key=1, #menuTabs do
+                local value = menuTabs[key]
+                if (value) then
+                    if (currentTab == value) then
+                        UI.Button(value["name"], Vec2(100, 20), function() 
+                            log(false, "current tab "..key)
+                        end)
+                    else
+                        UI.Button(value["name"], Vec2(100, 20), function() 
+                            log(false, "changed tab to "..key)
+                            currentTab = value
+                        end)
+                    end
+                    if (key < #menuTabs) then
+                        UI.SameLine()
+                    end
+                end
+            end
 
             UI.Checkbox("Test Checkbox", "cTestCheckbox", function() log(false, "Checkbox Toggled") end)
             UI.Button("Test Button", Vec2(100, 20), function() log(false, "Button Pressed") end)
