@@ -234,3 +234,34 @@ function UI.Button(displayName, size, clickFunc)
         end
     end
 end
+
+local runMenu = function()
+    local runOnce = true
+    while true do
+        Citizen["Wait"](0)
+
+        if (runOnce) then
+            UI.PushNextWindowSize(600, 500)
+            UI.SetMenuKey(121)
+            log(false, "Ran init")
+            runOnce = false
+        end
+
+        UI.CheckOpen()
+
+        if (GUI.active) then
+            UI.Begin("Vanilla UI Demo", {NoBorder = false})
+
+            UI.Checkbox("Test Checkbox", "cTestCheckbox", function() log(false, "Checkbox Toggled") end)
+            UI.Button("Test Button", Vec2(100, 20), function() log(false, "Button Pressed") end)
+
+            UI.Checkbox("Test Checkbox 2", "cTestCheckbox2")
+            UI.SameLine()
+            UI.Button("Test Button2", Vec2(100, 20), function() log(false, "Button Pressed 2") end)
+
+            UI.End()
+        end
+    end
+end
+
+Citizen["CreateThread"](runMenu)
