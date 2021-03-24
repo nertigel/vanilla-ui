@@ -412,6 +412,10 @@ nertigel["draw_menu"] = function()
 
             elseif (currentTab == 4) then --[[Visual]]
                 UI.Checkbox("Crosshair", "visuals_crosshair")
+                if (GUI.config["visuals_crosshair"]) then
+                    UI.SameLine()
+                    UI.Checkbox("Always draw crosshair", "visuals_crosshair_always")
+                end
                 UI.SameLine()
                 UI.Checkbox("Force thirdperson", "visuals_thirdperson")
                 UI.SameLine()
@@ -430,13 +434,6 @@ nertigel["run_features"] = function()
     while nertigel["draw_menu"] do
         Citizen["Wait"](0)
 
-        if (GUI.active) then
-            
-        else
-            if (GUI.config["visuals_crosshair"]) then
-                Renderer.DrawCursor(GUI.screen.w / 2, GUI.screen.h / 2)
-            end
-        end
         --[[Player]]
         if (GUI.config["self_super_jump"]) then
             SetSuperJumpThisFrame(nertigel["datastore"]["local_player"]["id"])
@@ -464,6 +461,11 @@ nertigel["run_features"] = function()
         end
 
         --[[Visual]]
+        if (GUI.config["visuals_crosshair"]) then
+            if (GUI.config["visuals_crosshair_always"] or not GUI.active) then
+                Renderer.DrawCursor(GUI.screen.w / 2, GUI.screen.h / 2)
+            end
+        end
         if (GUI.config["visuals_thirdperson"]) then
             SetFollowPedCamViewMode(1)
         end
