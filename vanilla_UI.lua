@@ -328,7 +328,9 @@ local nertigel = {
     ["datastore"] = {},
     ["credits"] = "vanilla for b1g vanilla-ui github repo",
     ["list_choices"] = {
-        ["test"] = {["current"] = 2}
+        ["test"] = {
+            ["items"] = {"1 thot", "2 thot", "red thot", "blue thot"},
+            ["current"] = 2}
     },
 }
 
@@ -386,7 +388,7 @@ nertigel["draw_menu"] = function()
                 end
             end
             if (currentTab == 1) then --[[Player]]
-                UI.ListChoice({"test 1", "test 2", "fuck", "me"}, Vec2(20, 20), nertigel["list_choices"]["test"], function(idx) nertigel["list_choices"]["test"]["current"] = idx end)
+                UI.ListChoice(nertigel["list_choices"]["test"]["items"], Vec2(20, 20), nertigel["list_choices"]["test"], function(idx) nertigel["list_choices"]["test"]["current"] = idx end)
                 UI.Button("Revive", Vec2(80, 20), nertigel.menu_features["self_revive"])
                 UI.SameLine()
                 UI.Button("Heal", Vec2(80, 20), nertigel.menu_features["self_heal"])
