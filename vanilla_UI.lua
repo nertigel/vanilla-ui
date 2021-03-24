@@ -270,6 +270,31 @@ function UI.TextControl(displayName)
     end
 end
 
+function UI.Separator(displayName)
+    GUI.vars.lastname = displayName
+    GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
+    GUI.prev_item = GUI.item
+    if (not GUI.vars.sameline) then
+        if (GUI.prev_item.y ~= 0) then
+            GUI.item = {x = GUI.position.x + 15, y = GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+        else
+            GUI.item = {x = GUI.position.x + 15, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+        end
+    else
+        GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 5, y = GUI.prev_item.y, w = 20, h = 20, name = displayName}
+        GUI.vars.sameline = false
+    end
+    GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI.item.w
+    
+    Renderer.DrawBorderedRect(GUI.item.x - 1, GUI.item.y, GUI.item.w + 546, GUI.item.h, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a)
+
+    if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
+        Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
+    else
+        Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
+    end
+end
+
 function UI.Groupbox(displayName) 
     Renderer.DrawBorderedRect(GUI.position.x+9, GUI.position.y+29, GUI.position.w-20, GUI.position.h-40, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
 end
@@ -340,6 +365,8 @@ nertigel["draw_menu"] = function()
                 UI.Button("Heal", Vec2(80, 20), nertigel.menu_features["self_heal"])
                 UI.SameLine()
                 UI.Button("Armour", Vec2(80, 20), nertigel.menu_features["self_armour"])
+
+                UI.Separator("Separator")
 
                 UI.Checkbox("Super jump", "self_super_jump")
                 UI.SameLine()
