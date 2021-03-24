@@ -12,7 +12,7 @@ local UI = {
         Item_Background = {r = 150, g = 150, b = 150, a = 225},
         Item_Hovered = {r = 0, g = 0, b = 0, a = 75},
         Item_Hold = {r = 255, g = 255, b = 255, a = 100},
-        Item_Toggled = {r = 0, g = 255, b = 255, a = 255},
+        Item_Toggled = {r = 255, g = 25, b = 55, a = 255},
         TextControl = {r = 255, g = 255, b = 255, a = 100},
         TextControl_Hovered = {r = 200, g = 200, b = 200, a = 175},
     }
@@ -261,7 +261,7 @@ function UI.TextControl(displayName)
         GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 5, y = GUI.prev_item.y, w = 20, h = 20, name = displayName}
         GUI.vars.sameline = false
     end
-    GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI.item.w
+    GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.30) + GUI.item.w - 25
     
     if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
         Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
@@ -299,20 +299,47 @@ function UI.Groupbox(displayName)
     Renderer.DrawBorderedRect(GUI.position.x+9, GUI.position.y+29, GUI.position.w-20, GUI.position.h-40, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
 end
 
+function UI.ListChoice(options, size, vars, callback) 
+    local optionsAmount = #options 
+    local currentIdx = vars.current
+    UI.Button("\194\171", Vec2(size[1], size[2]), function() 
+        if (currentIdx > 1) then 
+            currentIdx = currentIdx - 1 
+        else 
+            currentIdx = optionsAmount 
+        end 
+    end) 
+    UI.SameLine() 
+    UI.TextControl(options[currentIdx]) 
+    UI.SameLine() 
+    UI.Button("\194\187", Vec2(size[1], size[2]), function() 
+        if (currentIdx < optionsAmount) then 
+            currentIdx = currentIdx + 1 
+        else 
+            currentIdx = 1 
+        end 
+    end) 
+
+    callback(currentIdx)
+end 
+
 local nertigel = {
     ["draw_menu"] = true,
     ["datastore"] = {},
-    ["credits"] = "vanilla for b1g vanilla-ui github repo"
+    ["credits"] = "vanilla for b1g vanilla-ui github repo",
+    ["list_choices"] = {
+        ["test"] = {["current"] = 2}
+    },
 }
 
 nertigel["draw_menu"] = function()
     local runOnce = true
     local menuTabs = {
-        [1] = { ["name"] = "Player", ["size"] = Vec2(90, 20) },
-        [2] = { ["name"] = "Weapon", ["size"] = Vec2(90, 20) },
-        [3] = { ["name"] = "Vehicle", ["size"] = Vec2(90, 20) },
-        [4] = { ["name"] = "Visual", ["size"] = Vec2(90, 20) },
-        [5] = { ["name"] = "Settings", ["size"] = Vec2(90, 20) },
+        [1] = { ["name"] = "Player", ["size"] = Vec2(84, 20) },
+        [2] = { ["name"] = "Weapon", ["size"] = Vec2(84, 20) },
+        [3] = { ["name"] = "Vehicle", ["size"] = Vec2(84, 20) },
+        [4] = { ["name"] = "Visual", ["size"] = Vec2(84, 20) },
+        [5] = { ["name"] = "Settings", ["size"] = Vec2(84, 20) },
     }
     local currentTab = 1
     while nertigel["draw_menu"] do
@@ -337,7 +364,6 @@ nertigel["draw_menu"] = function()
         if (GUI.active) then --[[drawing menu]]
             UI.Begin("Nertigel's Pasted UI", {NoBorder = false})
 
-            --[[UI.TextControl("Current tab "..menuTabs[currentTab]["name"])]]
             UI.TextControl("Nertigel's Pasted UI")
             UI.SameLine()
             UI.Groupbox()
@@ -345,7 +371,7 @@ nertigel["draw_menu"] = function()
                 local value = menuTabs[key]
                 if (value) then
                     if (currentTab == key) then
-                        UI.Button(""..value["name"], Vec2(100, 20), function() 
+                        UI.Button(""..value["name"], Vec2(150, 20), function() 
                             log(false, "current tab "..key)
                         end)
                     else
@@ -360,6 +386,7 @@ nertigel["draw_menu"] = function()
                 end
             end
             if (currentTab == 1) then --[[Player]]
+                UI.ListChoice({"test 1", "test 2", "fuck", "me"}, Vec2(20, 20), nertigel["list_choices"]["test"], function(idx) nertigel["list_choices"]["test"]["current"] = idx end)
                 UI.Button("Revive", Vec2(80, 20), nertigel.menu_features["self_revive"])
                 UI.SameLine()
                 UI.Button("Heal", Vec2(80, 20), nertigel.menu_features["self_heal"])
