@@ -24,7 +24,7 @@ local GUI = {
     item = {x = 0, y = 0, w = 0, h = 0, name = ""},
     prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""},
     cursor = {x = 0, y = 0, old_x = 0, old_y = 0},
-    dragging = {Should_Drag = false, Should_Move = false},
+    dragging = {state = false},
     screen = {w = 0, h = 0},
     vars = {sameline = false, menuKey = -1, lastname = ""},
     config = {},
@@ -247,7 +247,7 @@ function UI.Button(displayName, size, clickFunc)
     end
 end
 
-function UI.TextControl(displayName)
+function UI.TextControl(displayName, clickFunc)
     GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
     GUI.prev_item = GUI.item
@@ -265,6 +265,11 @@ function UI.TextControl(displayName)
     
     if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
         Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
+        if (UI.natives.IsDisabledControlPressed(0, 24)) then
+            if (clickFunc) then
+                clickFunc()
+            end
+        end
     else
         Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
     end
@@ -366,7 +371,7 @@ nertigel["draw_menu"] = function()
         if (GUI.active) then --[[drawing menu]]
             UI.Begin("Nertigel's Pasted UI", {NoBorder = false})
 
-            UI.TextControl("Nertigel's Pasted UI")
+            UI.TextControl("Nertigel's Pasted UI", nertigel["handle_dragging"])
             UI.SameLine()
             UI.Groupbox()
             for key=1, #menuTabs do
@@ -503,3 +508,15 @@ nertigel.menu_features = {
         
     end),
 }
+
+nertigel["handle_dragging"] = function()
+    GUI.dragging.state = true
+    
+    if (GUI.dragging.state) then
+        GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
+        GUI.position.x = GUI.cursor.x - 45
+        GUI.position.y = GUI.cursor.y - 10
+    end
+
+    GUI.dragging.state = false
+end
