@@ -265,10 +265,11 @@ function UI.TextControl(displayName, clickFunc)
     
     if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
         Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
-        if (UI.natives.IsDisabledControlPressed(0, 24)) then
+        if (UI.natives.IsDisabledControlJustReleased(0, 24)) then
             if (clickFunc) then
                 clickFunc()
             end
+            return true
         end
     else
         Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
