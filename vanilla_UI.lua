@@ -20,7 +20,6 @@ local UI = {
 local GUI = {
     ["base"] = {
         nextSize = nil,
-        active = true,
         position = {x = 500, y = 250, w = 600, h = 500},
         item = {x = 0, y = 0, w = 0, h = 0, name = ""},
         prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""},
@@ -28,12 +27,12 @@ local GUI = {
     },
     ["playerlist"] = {
         nextSize = nil,
-        active = true,
         position = {x = 500, y = 250, w = 125, h = 300},
         item = {x = 0, y = 0, w = 0, h = 0, name = ""},
         prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""},
         vars = {sameline = false, selectedPlayer = nil}
     },
+    active = true,
     cursor = {x = 0, y = 0, old_x = 0, old_y = 0},
     dragging = {state = false},
     screen = {w = 0, h = 0},
