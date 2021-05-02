@@ -18,15 +18,26 @@ local UI = {
     }
 }
 local GUI = {
-    nextSize = nil,
-    active = true,
-    position = {x = 500, y = 250, w = 600, h = 500},
-    item = {x = 0, y = 0, w = 0, h = 0, name = ""},
-    prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""},
+    ["base"] = {
+        nextSize = nil,
+        active = true,
+        position = {x = 500, y = 250, w = 600, h = 500},
+        item = {x = 0, y = 0, w = 0, h = 0, name = ""},
+        prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""},
+        vars = {sameline = false}
+    },
+    ["playerlist"] = {
+        nextSize = nil,
+        active = true,
+        position = {x = 500, y = 250, w = 125, h = 300},
+        item = {x = 0, y = 0, w = 0, h = 0, name = ""},
+        prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""},
+        vars = {sameline = false, selectedPlayer = nil}
+    },
     cursor = {x = 0, y = 0, old_x = 0, old_y = 0},
     dragging = {state = false},
     screen = {w = 0, h = 0},
-    vars = {sameline = false, menuKey = -1, lastname = ""},
+    vars = {menuKey = -1, currentMenu = "base"},
     config = {},
 }
 GUI.screen.w, GUI.screen.h = Citizen.InvokeNative(0x873C9F3104101DD3, Citizen.PointerValueInt(), Citizen.PointerValueInt())
@@ -119,7 +130,7 @@ function Renderer.mouseInBounds(x, y, w, h)
 end
 
 function UI.PushNextWindowSize(w, h)
-    GUI.nextSize = {w = w, h = h}
+    GUI[GUI.vars.currentMenu].nextSize = {w = w, h = h}
 end
 
 function UI.DisableActions() 	DisableControlAction(1, 36, true) 	DisableControlAction(1, 37, true) 	DisableControlAction(1, 38, true) 	DisableControlAction(1, 44, true) 	DisableControlAction(1, 45, true) 	DisableControlAction(1, 69, true) 	DisableControlAction(1, 70, true) 	DisableControlAction(0, 63, true) 	DisableControlAction(0, 64, true) 	DisableControlAction(0, 278, true) 	DisableControlAction(0, 279, true) 	DisableControlAction(0, 280, true) 	DisableControlAction(0, 281, true) 	DisableControlAction(0, 91, true) 	DisableControlAction(0, 92, true) 	DisablePlayerFiring(PlayerId(), true) 	DisableControlAction(0, 24, true) 	DisableControlAction(0, 25, true) 	DisableControlAction(1, 37, true) 	DisableControlAction(0, 47, true) 	DisableControlAction(0, 58, true) 	DisableControlAction(0, 140, true) 	DisableControlAction(0, 141, true) 	DisableControlAction(0, 81, true) 	DisableControlAction(0, 82, true) 	DisableControlAction(0, 83, true) 	DisableControlAction(0, 84, true) 	DisableControlAction(0, 12, true) 	DisableControlAction(0, 13, true) 	DisableControlAction(0, 14, true) 	DisableControlAction(0, 15, true) 	DisableControlAction(0, 24, true) 	DisableControlAction(0, 16, true) 	DisableControlAction(0, 17, true) 	DisableControlAction(0, 96, true) 	DisableControlAction(0, 97, true) 	DisableControlAction(0, 98, true) 	DisableControlAction(0, 96, true) 	DisableControlAction(0, 99, true) 	DisableControlAction(0, 100, true) 	DisableControlAction(0, 142, true) 	DisableControlAction(0, 143, true) 	DisableControlAction(0, 263, true) 	DisableControlAction(0, 264, true) 	DisableControlAction(0, 257, true) 	DisableControlAction(1, 26, true) 	DisableControlAction(1, 23, true) 	DisableControlAction(1, 24, true) 	DisableControlAction(1, 25, true) 	DisableControlAction(1, 45, true) 	DisableControlAction(1, 45, true) 	DisableControlAction(1, 80, true) 	DisableControlAction(1, 140, true) 	DisableControlAction(1, 250, true) 	DisableControlAction(1, 263, true) 	DisableControlAction(1, 310, true) 	DisableControlAction(1, 37, true) 	DisableControlAction(1, 73, true) 	DisableControlAction(1, 1, true) 	DisableControlAction(1, 2, true) 	DisableControlAction(1, 335, true) 	DisableControlAction(1, 336, true) 	DisableControlAction(1, 106, true) end 
@@ -132,12 +143,13 @@ function UI.Begin(name, flags)
     if (name == nil) then
         return log(true, "Please provide a GUI name when calling 'GUI.Begin()'")
     else
-        if (GUI.nextSize) then
-            GUI.position.w, GUI.position.h = GUI.nextSize.w, GUI.nextSize.h
+        GUI.vars.currentMenu = name
+        if (GUI[GUI.vars.currentMenu].nextSize) then
+            GUI[GUI.vars.currentMenu].position.w, GUI[GUI.vars.currentMenu].position.h = GUI[GUI.vars.currentMenu].nextSize.w, GUI[GUI.vars.currentMenu].nextSize.h
         end
-        Renderer.DrawRect(GUI.position.x, GUI.position.y, GUI.position.w, GUI.position.h, UI.style.Background.r, UI.style.Background.g, UI.style.Background.b, UI.style.Background.a)
+        Renderer.DrawRect(GUI[GUI.vars.currentMenu].position.x, GUI[GUI.vars.currentMenu].position.y, GUI[GUI.vars.currentMenu].position.w, GUI[GUI.vars.currentMenu].position.h, UI.style.Background.r, UI.style.Background.g, UI.style.Background.b, UI.style.Background.a)
         if (not flags or not flags.NoBorder) then
-            Renderer.DrawBorderedRect(GUI.position.x-1, GUI.position.y-1, GUI.position.w+2, GUI.position.h+2, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
+            Renderer.DrawBorderedRect(GUI[GUI.vars.currentMenu].position.x-1, GUI[GUI.vars.currentMenu].position.y-1, GUI[GUI.vars.currentMenu].position.w+2, GUI[GUI.vars.currentMenu].position.h+2, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
         end
     end
     UI.DisableActions()
@@ -146,23 +158,18 @@ end
 -- Runs the end function for the menu.
 function UI.End()
     Renderer.DrawCursor()
-    GUI.item = {x = 0, y = 0, w = 0, h = 0, name = ""}
-    GUI.prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""}
+    GUI[GUI.vars.currentMenu].item = {x = 0, y = 0, w = 0, h = 0, name = ""}
+    GUI[GUI.vars.currentMenu].prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""}
 end
 
 -- Sets the next item in the UI to be on the same line as the previous item.
 function UI.SameLine()
-    GUI.vars.sameline = true
+    GUI[GUI.vars.currentMenu].vars.sameline = true
 end
 
 -- Sets the menu key (prefered to not run in a loop)
 function UI.SetMenuKey(key)
     GUI.vars.menuKey = key
-end
-
--- Returns the last displayname parameter passed
-function UI.GetLastName()
-    return (GUI.vars.lastname or "none")
 end
 
 -- Checks for menu key pressed
@@ -180,29 +187,28 @@ function UI.Checkbox(displayName, configName, clickFunc)
         GUI.config[configName] = false
         log(false, "Creating config variable for: " .. configName)
     end
-    GUI.vars.lastname = displayName
     local hoveredItem = "h"..configName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
-    GUI.prev_item = GUI.item
-    if (not GUI.vars.sameline) then
-        if (GUI.prev_item.y ~= 0) then
-            GUI.item = {x = GUI.position.x + 15, y = GUI.prev_item.y + GUI.prev_item.h + 10, w = 20, h = 20, name = displayName}
+    GUI[GUI.vars.currentMenu].prev_item = GUI[GUI.vars.currentMenu].item
+    if (not GUI[GUI.vars.currentMenu].vars.sameline) then
+        if (GUI[GUI.vars.currentMenu].prev_item.y ~= 0) then
+            GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].position.x + 15, y = GUI[GUI.vars.currentMenu].prev_item.y + GUI[GUI.vars.currentMenu].prev_item.h + 10, w = 20, h = 20, name = displayName}
         else
-            GUI.item = {x = GUI.position.x + 15, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 10, w = 20, h = 20, name = displayName}
+            GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].position.x + 15, y = GUI[GUI.vars.currentMenu].position.y + GUI[GUI.vars.currentMenu].prev_item.y + GUI[GUI.vars.currentMenu].prev_item.h + 10, w = 20, h = 20, name = displayName}
         end
     else
-        GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 10, y = GUI.prev_item.y, w = 20, h = 20, name = displayName}
-        GUI.vars.sameline = false
+        GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].prev_item.x + GUI[GUI.vars.currentMenu].prev_item.w + 10, y = GUI[GUI.vars.currentMenu].prev_item.y, w = 20, h = 20, name = displayName}
+        GUI[GUI.vars.currentMenu].vars.sameline = false
     end
-    GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI.item.w
-    Renderer.DrawText(GUI.item.x+22, GUI.item.y-2, UI.style.Checkbox_Text.r, UI.style.Checkbox_Text.g, UI.style.Checkbox_Text.b, UI.style.Checkbox_Text.a, tostring(displayName), 4, false, 0.30)
-    Renderer.DrawRect(GUI.item.x, GUI.item.y, 20, 20, UI.style.Item_Background.r, UI.style.Item_Background.g, UI.style.Item_Background.b, UI.style.Item_Background.a)
+    GUI[GUI.vars.currentMenu].item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI[GUI.vars.currentMenu].item.w
+    Renderer.DrawText(GUI[GUI.vars.currentMenu].item.x+22, GUI[GUI.vars.currentMenu].item.y-2, UI.style.Checkbox_Text.r, UI.style.Checkbox_Text.g, UI.style.Checkbox_Text.b, UI.style.Checkbox_Text.a, tostring(displayName), 4, false, 0.30)
+    Renderer.DrawRect(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, 20, 20, UI.style.Item_Background.r, UI.style.Item_Background.g, UI.style.Item_Background.b, UI.style.Item_Background.a)
     if (GUI.config[configName] == true) then
-        Renderer.DrawRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
+        Renderer.DrawRect(GUI[GUI.vars.currentMenu].item.x+1, GUI[GUI.vars.currentMenu].item.y+1, 18, 18, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
     end
-    if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
-        Renderer.DrawRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Hovered.r, UI.style.Item_Hovered.g, UI.style.Item_Hovered.b, UI.style.Item_Hovered.a)
-        Renderer.DrawBorderedRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
+    if (Renderer.mouseInBounds(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w, GUI[GUI.vars.currentMenu].item.h)) then
+        Renderer.DrawRect(GUI[GUI.vars.currentMenu].item.x+1, GUI[GUI.vars.currentMenu].item.y+1, 18, 18, UI.style.Item_Hovered.r, UI.style.Item_Hovered.g, UI.style.Item_Hovered.b, UI.style.Item_Hovered.a)
+        Renderer.DrawBorderedRect(GUI[GUI.vars.currentMenu].item.x+1, GUI[GUI.vars.currentMenu].item.y+1, 18, 18, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
 
         if (UI.natives.IsDisabledControlJustReleased(0, 24)) then
             GUI.config[configName] = not GUI.config[configName]
@@ -211,30 +217,29 @@ function UI.Checkbox(displayName, configName, clickFunc)
             end
         end
         if (UI.natives.IsDisabledControlPressed(0, 24)) then
-            Renderer.DrawRect(GUI.item.x+1, GUI.item.y+1, 18, 18, UI.style.Item_Hold.r, UI.style.Item_Hold.g, UI.style.Item_Hold.b, UI.style.Item_Hold.a)
+            Renderer.DrawRect(GUI[GUI.vars.currentMenu].item.x+1, GUI[GUI.vars.currentMenu].item.y+1, 18, 18, UI.style.Item_Hold.r, UI.style.Item_Hold.g, UI.style.Item_Hold.b, UI.style.Item_Hold.a)
         end
     end
 end
 
 function UI.Button(displayName, size, clickFunc)
-    GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
-    GUI.prev_item = GUI.item
-    if (not GUI.vars.sameline) then
-        if (GUI.prev_item.y ~= 0) then
-            GUI.item = {x = GUI.position.x + 15, y = GUI.prev_item.y + GUI.prev_item.h + 10, w = size[1], h = size[2], name = displayName}
+    GUI[GUI.vars.currentMenu].prev_item = GUI[GUI.vars.currentMenu].item
+    if (not GUI[GUI.vars.currentMenu].vars.sameline) then
+        if (GUI[GUI.vars.currentMenu].prev_item.y ~= 0) then
+            GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].position.x + 15, y = GUI[GUI.vars.currentMenu].prev_item.y + GUI[GUI.vars.currentMenu].prev_item.h + 10, w = size[1], h = size[2], name = displayName}
         else
-            GUI.item = {x = GUI.position.x + 15, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 10, w = size[1], h = size[2], name = displayName}
+            GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].position.x + 15, y = GUI[GUI.vars.currentMenu].position.y + GUI[GUI.vars.currentMenu].prev_item.y + GUI[GUI.vars.currentMenu].prev_item.h + 10, w = size[1], h = size[2], name = displayName}
         end
     else
-        GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 10, y = GUI.prev_item.y, w = size[1], h = size[2], name = displayName}
-        GUI.vars.sameline = false
+        GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].prev_item.x + GUI[GUI.vars.currentMenu].prev_item.w + 10, y = GUI[GUI.vars.currentMenu].prev_item.y, w = size[1], h = size[2], name = displayName}
+        GUI[GUI.vars.currentMenu].vars.sameline = false
     end
-    Renderer.DrawRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Background.r, UI.style.Item_Background.g, UI.style.Item_Background.b, UI.style.Item_Background.a)
-    Renderer.DrawText(GUI.item.x+(GUI.item.w/2), GUI.item.y-2, UI.style.Button_Text.r, UI.style.Button_Text.g, UI.style.Button_Text.b, UI.style.Button_Text.a, tostring(displayName), 4, true, 0.30)
-    if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
-        Renderer.DrawRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Hovered.r, UI.style.Item_Hovered.g, UI.style.Item_Hovered.b, UI.style.Item_Hovered.a)
-        Renderer.DrawBorderedRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
+    Renderer.DrawRect(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w, GUI[GUI.vars.currentMenu].item.h, UI.style.Item_Background.r, UI.style.Item_Background.g, UI.style.Item_Background.b, UI.style.Item_Background.a)
+    Renderer.DrawText(GUI[GUI.vars.currentMenu].item.x+(GUI[GUI.vars.currentMenu].item.w/2), GUI[GUI.vars.currentMenu].item.y-2, UI.style.Button_Text.r, UI.style.Button_Text.g, UI.style.Button_Text.b, UI.style.Button_Text.a, tostring(displayName), 4, true, 0.30)
+    if (Renderer.mouseInBounds(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w, GUI[GUI.vars.currentMenu].item.h)) then
+        Renderer.DrawRect(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w, GUI[GUI.vars.currentMenu].item.h, UI.style.Item_Hovered.r, UI.style.Item_Hovered.g, UI.style.Item_Hovered.b, UI.style.Item_Hovered.a)
+        Renderer.DrawBorderedRect(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w, GUI[GUI.vars.currentMenu].item.h, UI.style.Item_Toggled.r, UI.style.Item_Toggled.g, UI.style.Item_Toggled.b, UI.style.Item_Toggled.a)
         
         if (UI.natives.IsDisabledControlJustReleased(0, 24)) then
             if (clickFunc) then
@@ -242,67 +247,65 @@ function UI.Button(displayName, size, clickFunc)
             end
         end
         if (UI.natives.IsDisabledControlPressed(0, 24)) then
-            Renderer.DrawRect(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h, UI.style.Item_Hold.r, UI.style.Item_Hold.g, UI.style.Item_Hold.b, UI.style.Item_Hold.a)
+            Renderer.DrawRect(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w, GUI[GUI.vars.currentMenu].item.h, UI.style.Item_Hold.r, UI.style.Item_Hold.g, UI.style.Item_Hold.b, UI.style.Item_Hold.a)
         end
     end
 end
 
 function UI.TextControl(displayName, clickFunc)
-    GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
-    GUI.prev_item = GUI.item
-    if (not GUI.vars.sameline) then
-        if (GUI.prev_item.y ~= 0) then
-            GUI.item = {x = GUI.position.x + 10, y = GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+    GUI[GUI.vars.currentMenu].prev_item = GUI[GUI.vars.currentMenu].item
+    if (not GUI[GUI.vars.currentMenu].vars.sameline) then
+        if (GUI[GUI.vars.currentMenu].prev_item.y ~= 0) then
+            GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].position.x + 10, y = GUI[GUI.vars.currentMenu].prev_item.y + GUI[GUI.vars.currentMenu].prev_item.h + 5, w = 20, h = 20, name = displayName}
         else
-            GUI.item = {x = GUI.position.x + 10, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+            GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].position.x + 10, y = GUI[GUI.vars.currentMenu].position.y + GUI[GUI.vars.currentMenu].prev_item.y + GUI[GUI.vars.currentMenu].prev_item.h + 5, w = 20, h = 20, name = displayName}
         end
     else
-        GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 5, y = GUI.prev_item.y, w = 20, h = 20, name = displayName}
-        GUI.vars.sameline = false
+        GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].prev_item.x + GUI[GUI.vars.currentMenu].prev_item.w + 5, y = GUI[GUI.vars.currentMenu].prev_item.y, w = 20, h = 20, name = displayName}
+        GUI[GUI.vars.currentMenu].vars.sameline = false
     end
-    GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.30) + GUI.item.w - 25
+    GUI[GUI.vars.currentMenu].item.w = Renderer.GetTextWidth(displayName, 4, 0.30) + GUI[GUI.vars.currentMenu].item.w - 25
     
-    if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
-        Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
-        if (UI.natives.IsDisabledControlJustReleased(0, 24)) then
+    if (Renderer.mouseInBounds(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w, GUI[GUI.vars.currentMenu].item.h)) then
+        Renderer.DrawText(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
+        if (UI.natives.IsDisabledControlPressed(0, 24)) then
             if (clickFunc) then
                 clickFunc()
             end
             return true
         end
     else
-        Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
+        Renderer.DrawText(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
     end
 end
 
 function UI.Separator(displayName)
-    GUI.vars.lastname = displayName
     GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
-    GUI.prev_item = GUI.item
-    if (not GUI.vars.sameline) then
-        if (GUI.prev_item.y ~= 0) then
-            GUI.item = {x = GUI.position.x + 15, y = GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+    GUI[GUI.vars.currentMenu].prev_item = GUI[GUI.vars.currentMenu].item
+    if (not GUI[GUI.vars.currentMenu].vars.sameline) then
+        if (GUI[GUI.vars.currentMenu].prev_item.y ~= 0) then
+            GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].position.x + 15, y = GUI[GUI.vars.currentMenu].prev_item.y + GUI[GUI.vars.currentMenu].prev_item.h + 5, w = 20, h = 20, name = displayName}
         else
-            GUI.item = {x = GUI.position.x + 15, y = GUI.position.y + GUI.prev_item.y + GUI.prev_item.h + 5, w = 20, h = 20, name = displayName}
+            GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].position.x + 15, y = GUI[GUI.vars.currentMenu].position.y + GUI[GUI.vars.currentMenu].prev_item.y + GUI[GUI.vars.currentMenu].prev_item.h + 5, w = 20, h = 20, name = displayName}
         end
     else
-        GUI.item = {x = GUI.prev_item.x + GUI.prev_item.w + 5, y = GUI.prev_item.y, w = 20, h = 20, name = displayName}
-        GUI.vars.sameline = false
+        GUI[GUI.vars.currentMenu].item = {x = GUI[GUI.vars.currentMenu].prev_item.x + GUI[GUI.vars.currentMenu].prev_item.w + 5, y = GUI[GUI.vars.currentMenu].prev_item.y, w = 20, h = 20, name = displayName}
+        GUI[GUI.vars.currentMenu].vars.sameline = false
     end
-    GUI.item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI.item.w
+    GUI[GUI.vars.currentMenu].item.w = Renderer.GetTextWidth(displayName, 4, 0.3)+GUI[GUI.vars.currentMenu].item.w
     
-    Renderer.DrawBorderedRect(GUI.item.x - 1, GUI.item.y, GUI.item.w + 546, GUI.item.h, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a)
+    Renderer.DrawBorderedRect(GUI[GUI.vars.currentMenu].item.x - 1, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w + 546, GUI[GUI.vars.currentMenu].item.h, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a)
 
-    if (Renderer.mouseInBounds(GUI.item.x, GUI.item.y, GUI.item.w, GUI.item.h)) then
-        Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
+    if (Renderer.mouseInBounds(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y, GUI[GUI.vars.currentMenu].item.w, GUI[GUI.vars.currentMenu].item.h)) then
+        Renderer.DrawText(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y-2, UI.style.TextControl_Hovered.r, UI.style.TextControl_Hovered.g, UI.style.TextControl_Hovered.b, UI.style.TextControl_Hovered.a, tostring(displayName), 4, false, 0.30)
     else
-        Renderer.DrawText(GUI.item.x, GUI.item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
+        Renderer.DrawText(GUI[GUI.vars.currentMenu].item.x, GUI[GUI.vars.currentMenu].item.y-2, UI.style.TextControl.r, UI.style.TextControl.g, UI.style.TextControl.b, UI.style.TextControl.a, tostring(displayName), 4, false, 0.30)
     end
 end
 
 function UI.Groupbox(displayName) 
-    Renderer.DrawBorderedRect(GUI.position.x+9, GUI.position.y+29, GUI.position.w-20, GUI.position.h-40, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
+    Renderer.DrawBorderedRect(GUI[GUI.vars.currentMenu].position.x+9, GUI[GUI.vars.currentMenu].position.y+29, GUI[GUI.vars.currentMenu].position.w-20, GUI[GUI.vars.currentMenu].position.h-40, UI.style.Background_Border.r, UI.style.Background_Border.g, UI.style.Background_Border.b, UI.style.Background_Border.a)
 end
 
 function UI.ListChoice(options, size, vars, callback) 
@@ -370,66 +373,96 @@ nertigel["draw_menu"] = function()
         UI.CheckOpen()
 
         if (GUI.active) then --[[drawing menu]]
-            UI.Begin("Nertigel's Pasted UI", {NoBorder = false})
+            UI.Begin("base", {NoBorder = false})
+                UI.TextControl("Nertigel's Pasted UI", nertigel["handle_dragging"])
+                UI.SameLine()
+                UI.Groupbox()
+                for key=1, #menuTabs do
+                    local value = menuTabs[key]
+                    if (value) then
+                        if (currentTab == key) then
+                            UI.Button(""..value["name"], Vec2(150, 20), function() 
+                                log(false, "current tab "..key)
+                            end)
+                        else
+                            UI.Button(value["name"], value["size"], function() 
+                                log(false, "changed tab to "..key)
+                                currentTab = key
+                            end)
+                        end
+                        if (key < #menuTabs) then
+                            UI.SameLine()
+                        end
+                    end
+                end
+                if (currentTab == 1) then --[[Player]]
+                    UI.ListChoice(nertigel["list_choices"]["test"]["items"], Vec2(20, 20), nertigel["list_choices"]["test"], function(idx) nertigel["list_choices"]["test"]["current"] = idx end)
+                    UI.Button("Revive", Vec2(80, 20), nertigel.menu_features["self_revive"])
+                    UI.SameLine()
+                    UI.Button("Heal", Vec2(80, 20), nertigel.menu_features["self_heal"])
+                    UI.SameLine()
+                    UI.Button("Armour", Vec2(80, 20), nertigel.menu_features["self_armour"])
 
-            UI.TextControl("Nertigel's Pasted UI", nertigel["handle_dragging"])
-            UI.SameLine()
-            UI.Groupbox()
-            for key=1, #menuTabs do
-                local value = menuTabs[key]
-                if (value) then
-                    if (currentTab == key) then
-                        UI.Button(""..value["name"], Vec2(150, 20), function() 
-                            log(false, "current tab "..key)
+                    UI.Separator("Separator")
+
+                    UI.Checkbox("Super jump", "self_super_jump")
+                    UI.SameLine()
+                    UI.Checkbox("Infinite stamina", "self_infinite_stamina")
+                    UI.SameLine()
+                    UI.Checkbox("Heat vision", "self_heat_vision")
+                    UI.SameLine()
+                    UI.Checkbox("Night vision", "self_night_vision")
+                    UI.SameLine()
+                    UI.Checkbox("Never wanted", "self_never_wanted")
+                elseif (currentTab == 2) then --[[Weapon]]
+                    UI.Checkbox("Infinite combat roll", "weapons_infinite_combat_roll")
+                elseif (currentTab == 3) then --[[Vehicle]]
+
+                elseif (currentTab == 4) then --[[Visual]]
+                    UI.Checkbox("Crosshair", "visuals_crosshair")
+                    if (GUI.config["visuals_crosshair"]) then
+                        UI.SameLine()
+                        UI.Checkbox("Always draw crosshair", "visuals_crosshair_always")
+                    end
+                    UI.SameLine()
+                    UI.Checkbox("Force thirdperson", "visuals_thirdperson")
+                    UI.SameLine()
+                    UI.Checkbox("Force radar", "visuals_force_radar")
+                elseif (currentTab == 5) then --[[Settings]]
+                    UI.Button("Unload", Vec2(80, 20), nertigel.menu_features["unload_menu"])
+                end
+            UI.End()
+            UI.Begin("playerlist", {NoBorder = false})
+                GUI["playerlist"].position.x = GUI["base"].position.x + 665
+                GUI["playerlist"].position.y = GUI["base"].position.y
+                
+                if (GUI["playerlist"].vars.selectedPlayer ~= nil) then
+                    local ped = GetPlayerPed(GUI["playerlist"].vars.selectedPlayer)
+                    if (DoesEntityExist(ped) and IsPedAPlayer(ped)) then
+                        UI.TextControl("Back", function() 
+                            GUI["playerlist"].vars.selectedPlayer = nil 
+                        end)
+                        UI.Checkbox("Friendly", "playerlist_friendly_"..ped)
+                        --[[
+                            to check if someone is a friend just do this:
+                            if (GUI.config["playerlist_friendly_"..specify_ped]) then
+                                then he is friendly
+                            end
+                        ]]
+                        UI.TextControl("Teleport", function() 
+                            SetEntityCoords(nertigel["datastore"]["local_player"]["ped"], GetEntityCoords(ped))
                         end)
                     else
-                        UI.Button(value["name"], value["size"], function() 
-                            log(false, "changed tab to "..key)
-                            currentTab = key
+                        GUI["playerlist"].vars.selectedPlayer = nil
+                    end
+                else
+                    for key, value in pairs(GetActivePlayers()) do
+                        UI.TextControl("Player-list")
+                        UI.TextControl(GetPlayerName(value), function() 
+                            GUI["playerlist"].vars.selectedPlayer = value 
                         end)
                     end
-                    if (key < #menuTabs) then
-                        UI.SameLine()
-                    end
                 end
-            end
-            if (currentTab == 1) then --[[Player]]
-                UI.ListChoice(nertigel["list_choices"]["test"]["items"], Vec2(20, 20), nertigel["list_choices"]["test"], function(idx) nertigel["list_choices"]["test"]["current"] = idx end)
-                UI.Button("Revive", Vec2(80, 20), nertigel.menu_features["self_revive"])
-                UI.SameLine()
-                UI.Button("Heal", Vec2(80, 20), nertigel.menu_features["self_heal"])
-                UI.SameLine()
-                UI.Button("Armour", Vec2(80, 20), nertigel.menu_features["self_armour"])
-
-                UI.Separator("Separator")
-
-                UI.Checkbox("Super jump", "self_super_jump")
-                UI.SameLine()
-                UI.Checkbox("Infinite stamina", "self_infinite_stamina")
-                UI.SameLine()
-                UI.Checkbox("Heat vision", "self_heat_vision")
-                UI.SameLine()
-                UI.Checkbox("Night vision", "self_night_vision")
-                UI.SameLine()
-                UI.Checkbox("Never wanted", "self_never_wanted")
-            elseif (currentTab == 2) then --[[Weapon]]
-                UI.Checkbox("Infinite combat roll", "weapons_infinite_combat_roll")
-            elseif (currentTab == 3) then --[[Vehicle]]
-
-            elseif (currentTab == 4) then --[[Visual]]
-                UI.Checkbox("Crosshair", "visuals_crosshair")
-                if (GUI.config["visuals_crosshair"]) then
-                    UI.SameLine()
-                    UI.Checkbox("Always draw crosshair", "visuals_crosshair_always")
-                end
-                UI.SameLine()
-                UI.Checkbox("Force thirdperson", "visuals_thirdperson")
-                UI.SameLine()
-                UI.Checkbox("Force radar", "visuals_force_radar")
-            elseif (currentTab == 5) then --[[Settings]]
-                UI.Button("Unload", Vec2(80, 20), nertigel.menu_features["unload_menu"])
-            end
-
             UI.End()
         end
     end
@@ -515,8 +548,8 @@ nertigel["handle_dragging"] = function()
     
     if (GUI.dragging.state) then
         GUI.cursor.x, GUI.cursor.y = UI.natives.GetNuiCursorPosition()
-        GUI.position.x = GUI.cursor.x - 45
-        GUI.position.y = GUI.cursor.y - 10
+        GUI[GUI.vars.currentMenu].position.x = GUI.cursor.x - 38
+        GUI[GUI.vars.currentMenu].position.y = GUI.cursor.y - 15
     end
 
     GUI.dragging.state = false
