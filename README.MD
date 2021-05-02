@@ -9,9 +9,7 @@ At the moment this only supports one window.
 
 ### Planned Updates
 ------------
-- Dragging. (Next update SOON&trade;)
 - Scrolling
-- Multiple window support.
 - Sliders
 - Textbox
 
