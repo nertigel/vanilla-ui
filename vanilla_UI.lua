@@ -30,7 +30,7 @@ local GUI = {
         position = {x = 500, y = 250, w = 125, h = 300},
         item = {x = 0, y = 0, w = 0, h = 0, name = ""},
         prev_item = {x = 0, y = 0, w = 0, h = 0, name = ""},
-        vars = {sameline = false, selectedPlayer = nil}
+        vars = {sameline = false, selectedPlayer = nil, trash_y = 0.008}
     },
     active = true,
     cursor = {x = 0, y = 0, old_x = 0, old_y = 0},
@@ -455,11 +455,26 @@ nertigel["draw_menu"] = function()
                         GUI["playerlist"].vars.selectedPlayer = nil
                     end
                 else
+                    --[[ghetto scroll method, credits to WM Mock by Migma]]
+                    if (IsDisabledControlJustPressed(0, 15)) then --[[up]]
+                        GUI["playerlist"].vars.trash_y = GUI["playerlist"].vars.trash_y + 0.015
+                    end
+                    if (IsDisabledControlJustPressed(0, 14)) then --[[down]]
+                        if (GUI["playerlist"].vars.trash_y <= 0.015) then
+                            GUI["playerlist"].vars.trash_y = GUI["playerlist"].vars.trash_y - 0.015
+                        else
+                            GUI["playerlist"].vars.trash_y = 0.015
+                        end
+                    end
+                    UI.TextControl("Player-list", function() GUI["playerlist"].vars.trash_y = 0.008 end)
                     for key, value in pairs(GetActivePlayers()) do
-                        UI.TextControl("Player-list")
-                        UI.TextControl(GetPlayerName(value), function() 
-                            GUI["playerlist"].vars.selectedPlayer = value 
-                        end)
+                        local buttonypos = ((0.26*1.0) + (key-1) * 0.02) + GUI["playerlist"].vars.trash_y
+        
+                        if (buttonypos >= 0.26 and buttonypos <= 0.4700) then
+                            UI.TextControl(GetPlayerName(value), function() 
+                                GUI["playerlist"].vars.selectedPlayer = value 
+                            end)
+                        end
                     end
                 end
             UI.End()
